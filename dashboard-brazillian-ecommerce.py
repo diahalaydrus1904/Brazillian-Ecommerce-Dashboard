@@ -6,7 +6,6 @@ from babel.numbers import format_currency
 import plotly.express as px
 import json
 import urllib.request
-import os
 
 @st.cache_data
 def load_brazil_geojson():
@@ -21,52 +20,17 @@ def load_brazil_geojson():
 
 sns.set(style="darkgrid")
 
-DATA_DIR = "data"
-
 @st.cache_data
 def load_data():
-    # CHECK DATA FILES
-    required_files = [
-        "orders_dataset.csv",
-        "order_items_dataset.csv",
-        "order_payments_dataset.csv",
-        "order_reviews_dataset.csv",
-        "customers_dataset.csv",
-        "products_dataset.csv",
-        "sellers_dataset.csv",
-        "product_category_name_translation.csv",
-    ]
-
-    missing_files = [
-        f for f in required_files
-        if not os.path.exists(os.path.join(DATA_DIR, f))
-    ]
-
-    if missing_files:
-        st.error(
-            """
-### Dataset not found
-
-This dashboard uses the **Olist Brazilian E-Commerce Dataset**.
-
-Please download the dataset from Kaggle and place all CSV files inside a `data/` folder.
-
-🔗 https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce
-"""
-        )
-        st.stop()
-
     # LOAD RAW CSV FILES
-    orders_df = pd.read_csv(os.path.join(DATA_DIR, "orders_dataset.csv"))
-    order_items_df = pd.read_csv(os.path.join(DATA_DIR, "order_items_dataset.csv"))
-    order_payments_df = pd.read_csv(os.path.join(DATA_DIR, "order_payments_dataset.csv"))
-    order_reviews_df = pd.read_csv(os.path.join(DATA_DIR, "order_reviews_dataset.csv"))
-    customers_df = pd.read_csv(os.path.join(DATA_DIR, "customers_dataset.csv"))
-    products_df = pd.read_csv(os.path.join(DATA_DIR, "products_dataset.csv"))
-    sellers_df = pd.read_csv(os.path.join(DATA_DIR, "sellers_dataset.csv"))
-    category_df = pd.read_csv(
-        os.path.join(DATA_DIR, "product_category_name_translation.csv")
-    )
+    orders_df = pd.read_csv("orders_dataset.csv")
+    order_items_df = pd.read_csv("order_items_dataset.csv")
+    order_payments_df = pd.read_csv("order_payments_dataset.csv")
+    order_reviews_df = pd.read_csv("order_reviews_dataset.csv")
+    customers_df = pd.read_csv("customers_dataset.csv")
+    products_df = pd.read_csv("products_dataset.csv")
+    sellers_df = pd.read_csv("sellers_dataset.csv")
+    category_df = pd.read_csv("product_category_name_translation.csv")
 
     # DATETIME CONVERSION
     datetime_cols = [
@@ -81,13 +45,56 @@ Please download the dataset from Kaggle and place all CSV files inside a `data/`
             orders_df[col] = pd.to_datetime(orders_df[col], errors="coerce")
 
     # MERGE PROCESS
-    all_df = orders_df.merge(customers_df, on="customer_id", how="left")
-    all_df = all_df.merge(order_items_df, on="order_id", how="inner")
-    all_df = all_df.merge(order_payments_df, on="order_id", how="left")
-    all_df = all_df.merge(order_reviews_df, on="order_id", how="left")
-    all_df = all_df.merge(products_df, on="product_id", how="left")
-    all_df = all_df.merge(category_df, on="product_category_name", how="left")
-    all_df = all_df.merge(sellers_df, on="seller_id", how="left")
+
+    # orders + customers
+    all_df = orders_df.merge(
+        customers_df,
+        on="customer_id",
+        how="left"
+    )
+
+    # + order items
+    all_df = all_df.merge(
+        order_items_df,
+        on="order_id",
+        how="inner"
+    )
+
+    # + payments
+    all_df = all_df.merge(
+        order_payments_df,
+        on="order_id",
+        how="left"
+    )
+
+    # + reviews
+    all_df = all_df.merge(
+        order_reviews_df,
+        on="order_id",
+        how="left"
+    )
+
+    # + products
+    all_df = all_df.merge(
+        products_df,
+        on="product_id",
+        how="left"
+    )
+
+    # + category translation
+    all_df = all_df.merge(
+        category_df,
+        on="product_category_name",
+        how="left"
+    )
+
+    # + sellers
+    all_df = all_df.merge(
+        sellers_df,
+        on="seller_id",
+        how="left"
+    )
+
 
     # FEATURE ENGINEERING
     all_df["revenue"] = all_df["price"] + all_df["freight_value"]
