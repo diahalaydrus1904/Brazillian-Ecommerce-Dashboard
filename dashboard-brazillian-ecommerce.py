@@ -23,14 +23,14 @@ sns.set(style="darkgrid")
 @st.cache_data
 def load_data():
     # LOAD RAW CSV FILES
-    orders_df = pd.read_csv("orders_dataset.csv")
-    order_items_df = pd.read_csv("order_items_dataset.csv")
-    order_payments_df = pd.read_csv("order_payments_dataset.csv")
-    order_reviews_df = pd.read_csv("order_reviews_dataset.csv")
-    customers_df = pd.read_csv("customers_dataset.csv")
-    products_df = pd.read_csv("products_dataset.csv")
-    sellers_df = pd.read_csv("sellers_dataset.csv")
-    category_df = pd.read_csv("product_category_name_translation.csv")
+    orders_df = pd.read_csv("data/orders_dataset.csv")
+    order_items_df = pd.read_csv("data/order_items_dataset.csv")
+    order_payments_df = pd.read_csv("data/order_payments_dataset.csv")
+    order_reviews_df = pd.read_csv("data/order_reviews_dataset.csv")
+    customers_df = pd.read_csv("data/customers_dataset.csv")
+    products_df = pd.read_csv("data/products_dataset.csv")
+    sellers_df = pd.read_csv("data/sellers_dataset.csv")
+    category_df = pd.read_csv("data/product_category_name_translation.csv")
 
     # DATETIME CONVERSION
     datetime_cols = [
@@ -580,3 +580,4 @@ st.markdown(
     'Built by Rodiah Hasan Alaydrus',
     unsafe_allow_html=True
 )
+
