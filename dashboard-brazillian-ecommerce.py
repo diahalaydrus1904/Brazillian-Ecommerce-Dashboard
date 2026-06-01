@@ -128,7 +128,7 @@ filtered_df = all_df[
 # HELPER FUNCTIONS
 def monthly_revenue(df):
     monthly = (
-        df.resample("M", on="order_purchase_timestamp")
+        df.resample("ME", on="order_purchase_timestamp")
           .agg(total_revenue=("payment_value", "sum"),
                total_orders=("order_id", "nunique"))
           .reset_index()
